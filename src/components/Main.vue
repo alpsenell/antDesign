@@ -74,21 +74,19 @@
               :visible="editDrawerVisibility"
               title="Create"
               :width="400"
-              @close="setEditDrawerVisibility(false)">
+              @close="closeEditDrawer">
       <a-input-group size="large">
         <a-input
             id="editTitle"
-            :default-value="activeTableData.title"
-            placeholder="Enter new Title"
-            @change="setEdittedTitle">
+            v-model="edittedTitle"
+            placeholder="Enter new Title">
         </a-input>
       </a-input-group>
       <a-input-group size="large">
         <a-input
             id="editStatus"
-            :default-value="activeTableData.status"
-            placeholder="Enter new Status"
-            @change="setEdittedStatus">
+            v-model="edittedStatus"
+            placeholder="Enter new Status">
         </a-input>
       </a-input-group>
       <div
@@ -104,7 +102,7 @@
             zIndex: 1,
           }"
       >
-        <a-button :style="{ marginRight: '8px' }" @click="setEditDrawerVisibility(false)">
+        <a-button :style="{ marginRight: '8px' }" @click="closeEditDrawer">
           Cancel
         </a-button>
         <a-button type="primary" @click="editActiveData">
@@ -157,6 +155,16 @@
             };
         },
 
+      watch: {
+        activeTableData: {
+          deep: true,
+          handler () {
+            this.edittedTitle = this.activeTableData.title;
+            this.edittedStatus = this.activeTableData.status;
+          }
+        }
+      },
+
       computed: {
         ...mapState([
           'tableData',
@@ -177,7 +185,8 @@
             'addNewDataToState',
             'removeDataFromState',
             'setActiveData',
-            'editActiveData'
+            'editActiveDataFromState',
+            'resetActiveData'
         ]),
 
         /**
@@ -194,6 +203,11 @@
         setEditDrawerVisibility (value) {
           this.editDrawerVisibility = value;
         },
+        
+        closeEditDrawer () {
+          this.setEditDrawerVisibility(false);
+          this.resetActiveData();
+        },
 
         resetInputValues () {
           this.newStatus = '';
@@ -207,23 +221,28 @@
             id: this.getMaximumID + 1
           });
           this.setCreateDrawerVisibility(false);
+
+          this.$message.success('Successfully Created');
         },
 
         /**
          * @param {number} idToFind
          */
         findRelatedDataIndex (idToFind) {
-          return this.tableData.find(data => data.id === idToFind);
+          const selectedData = this.tableData.find(data => data.id === idToFind);
+
+          return this.tableData.indexOf(selectedData);
         },
 
         /**
          * @param {number} id
          */
         editData ({ id }) {
-          console.log(id);
-          console.log(this.findRelatedDataIndex(id));
+          this.setActiveData(
+              this.findRelatedDataIndex(id)
+          );
 
-          this.setActiveData(id)
+          this.setEditDrawerVisibility(true);
         },
 
         /**
@@ -238,21 +257,16 @@
         },
 
         editActiveData () {
-          this.editActiveData({
+          this.editActiveDataFromState({
             title: this.edittedTitle,
             status: this.edittedStatus
           });
 
           this.edittedTitle = '';
           this.edittedStatus = '';
-        },
+          this.closeEditDrawer();
 
-        setEdittedTitle (value) {
-          this.edittedTitle = value;
-        },
-
-        setEdittedStatus (value) {
-          this.edittedStatus = value;
+          this.$message.success('Successfully Edited');
         }
       }
     }

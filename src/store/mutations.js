@@ -32,19 +32,32 @@ export default {
     /**
      * @name setActiveData
      * @param {object} state
-     * @param {number} idToFind
+     * @param {number} index
      */
-    [Mutation.SET_ACTIVE_DATA] (state, idToFind) {
-        state.activeTableData = state.tableData[state.tableData.find(data => data.id = idToFind)];
+    [Mutation.SET_ACTIVE_DATA] (state, index) {
+        const clone = JSON.parse(JSON.stringify(state.tableData));
+
+        state.activeTableData = clone[index];
     },
 
     /**
-     * @name editActiveData
+     * @name resetActiveData
+     * @param {object} state
+     */
+    [Mutation.RESET_ACTIVE_DATA] (state) {
+        state.activeTableData = {};
+    },
+
+    /**
+     * @name editActiveDataFromState
      * @param {object} state
      * @param {object} config
      */
-    [Mutation.EDIT_ACTIVE_DATA] (state, config) {
-        Vue.set(state.tableData[state.activeTableData], 'title', config.title);
-        Vue.set(state.tableData[state.activeTableData], 'status', config.status);
+    [Mutation.EDIT_ACTIVE_DATA_FROM_STATE] (state, config) {
+        const selectedData = state.tableData.find(data => data.id === state.activeTableData.id);
+        const indexToChange = state.tableData.indexOf(selectedData);
+
+        Vue.set(state.tableData[indexToChange], 'title', config.title);
+        Vue.set(state.tableData[indexToChange], 'status', config.status);
     }
 }
