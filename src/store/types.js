@@ -4,5 +4,8 @@ export const Action = {
 
 export const Mutation = {
     SET_DATA: 'setData',
-    ADD_NEW_DATA: 'addNewData'
+    ADD_NEW_DATA_TO_STATE: 'addNewDataToState',
+    REMOVE_DATA_FROM_STATE: 'removeDataFromState',
+    SET_ACTIVE_DATA: 'setActiveData',
+    EDIT_ACTIVE_DATA: 'editActiveData'
 };
